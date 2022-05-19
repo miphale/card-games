@@ -14,4 +14,16 @@ public class Card implements Serializable {
 		this.face = face;
 		this.suit = suit;
 	}
+
+	public Face getFace() {
+		return face;
+	}
+
+	public Suit getSuit() {
+		return suit;
+	}
+	
+	public String display() {
+		return face + " of " + suit;
+	}
 }
