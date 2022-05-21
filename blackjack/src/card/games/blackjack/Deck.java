@@ -56,7 +56,7 @@ public class Deck implements Serializable {
 	
 	public void displayDeck() {
 		for (Card card: cards) {
-			card.display();
+			System.out.println(card.display());
 		}
 	}
 }

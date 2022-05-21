@@ -10,6 +10,7 @@ public class Blackjack implements Serializable {
 	private static Player player;
 	private static Player dealer;
 	private static List<Player> opponents;
+	private static boolean opponentsExist = false;
 	private static Deck deck = new Deck();
 	private static int roundCount;
 	private static boolean gameOver = false;
@@ -71,10 +72,28 @@ public class Blackjack implements Serializable {
 			deck = new Deck();
 			deck.shuffle();
 			opponents = null;
+			opponentsExist = false;
+			gameOver = false;
 			mainMenu();
 		} else {
 			System.out.println("Invalid option!");
 		}
+	}
+	
+	private static void setupOpponents(int numOfOpponemts) {
+		opponentsExist = true;
+		
+		opponents = new ArrayList<Player>();
+		
+		for (int i = 0; i < numOfOpponemts; i++) {
+			Player player = new Player(randomName());
+			opponents.add(player);
+		}
+	}
+	
+	static String randomName() {
+		String[] names = {"Thabo", "Frank", "Seroke", "Erik", "Leto", "Stilgar", "Mangole", "Norah", "Oratile", "Omphile", "Gaaratwe", "Thebeetsile", "Midah", "Hildah"};
+		return names[(int) (Math.random() * names.length)];
 	}
 	
 	private static void playBlackjack() {
@@ -90,14 +109,24 @@ public class Blackjack implements Serializable {
 	}
 	
 	private static void dealAllIn() {
+		deck.dealPlayerIn(dealer, true);
+		deck.dealPlayerIn(player, false);
+		if(opponentsExist) {
+			dealOpponentsIn(opponents, false);
+		}
 		deck.dealPlayerIn(dealer, false);
 		deck.dealPlayerIn(player, false);
-		dealOpponentsIn(opponents, false);
-		deck.dealPlayerIn(dealer, false);
-		deck.dealPlayerIn(player, false);
-		dealOpponentsIn(opponents, false);
+		if(opponentsExist) {
+			dealOpponentsIn(opponents, false);
+		}
 		
 		revealAllPlayerHands();
+	}
+	
+	private static void dealOpponentsIn(List<Player> opponents, boolean show) {
+		for(Player opponent: opponents) {
+			deck.dealPlayerIn(opponent, show);
+		}
 	}
 	
 	private static void revealAllPlayerHands() {
@@ -106,24 +135,45 @@ public class Blackjack implements Serializable {
 		System.out.println(dealer.displayHand(false));
 		System.out.println();
 		System.out.println(player.displayHand(false));
-		evaluateHandValueAgainstDealer(player.getHandValue());
-		for(Player opponent: opponents) {
-			System.out.println(opponent.displayHand(false));
-			evaluateHandValueAgainstDealer(opponent.getHandValue());
+		evaluatePlayers();
+	}
+	
+	private static void evaluatePlayers() {
+		if(dealer.getHandValue() > 21) {
+			System.out.println();
+			System.out.println("Dealer's hand is over 21. Dealer loses.");
+			playersWin();
+		} else {
+			evaluatelayerAgainstDealer(player);
+			
+			if(opponentsExist) {
+				for(Player opponent: opponents) {
+					System.out.println(opponent.displayHand(false));
+					evaluatelayerAgainstDealer(opponent);
+				}
+			}
 		}
 	}
 	
-	private static void evaluateHandValueAgainstDealer(int handValue) {
-		if (handValue >= dealer.getHandValue()) {
-			if(handValue > 21) {
-				System.out.println("Lose.");
-			} else {
-				System.out.println("Beats dealer.");
-			}
+	private static void evaluatelayerAgainstDealer(Player playerToEvaluate) {
+		if(beatsDealer(playerToEvaluate)) {
+			System.out.println("Beats Dealer.");
 		} else {
-			System.out.println("Lose.");
+			System.out.println("Loses.");
 		}
-		System.out.println();		
+		System.out.println();
+	}
+	
+	private static boolean beatsDealer(Player playerToEvaluate) {
+		if (playerToEvaluate.getHand().size() == 5 && playerToEvaluate.getHandValue() < 21) {
+			return true;
+		}
+		
+		if (playerToEvaluate.getHandValue() >= dealer.getHandValue() && playerToEvaluate.getHandValue() < 21) {
+			return true;
+		}
+		
+		return false;
 	}
 	
 	private static void oneMoreRound() {
@@ -134,29 +184,37 @@ public class Blackjack implements Serializable {
 		
 		if (decision.toUpperCase().equals("Y")) {
 			roundCount+=1;
-			System.out.println("incomplete");
-			//TODO
-			gameOver = true;
+
+			deck.dealPlayerIn(player, false);
+			if(opponentsExist) {
+				dealOpponentsIn(opponents, false);
+			}
+			
+			revealAllPlayerHands();
+		} else if (decision.toUpperCase().equals("N")) {
+			while(!gameOver) {
+				dealerDraws();
+			}
+		} else {
+			System.out.println("Select either Y or N.");
 		}
 	}
 	
-	private static void setupOpponents(int numOfOpponemts) {
-		opponents = new ArrayList<Player>();
+	private static void dealerDraws() {
+		if(dealer.getHandValue() > 21) {
+			System.out.println("Dealer's hand is over 21. Dealer loses.");
+			playersWin();
+		} else if(dealer.getHandValue() <= 16) {
+			deck.dealPlayerIn(dealer, true);
+			revealAllPlayerHands();
+		} else {
+			revealAllPlayerHands();
+		}
 		
-		for (int i = 0; i < numOfOpponemts; i++) {
-			Player player = new Player(randomName());
-			opponents.add(player);
-		}
 	}
 	
-	private static void dealOpponentsIn(List<Player> opponents, boolean show) {
-		for(Player opponent: opponents) {
-			deck.dealPlayerIn(opponent, show);
-		}
-	}
-	
-	static String randomName() {
-		String[] names = {"Thabo", "Frank", "Seroke", "Erik", "Leto", "Stilgar", "Mangole", "Norah", "Oratile", "Omphile", "Gaaratwe", "Thebeetsile", "Midah", "Hildah"};
-		return names[(int) (Math.random() * names.length)];
+	private static void playersWin() {
+		System.out.println("Players win.");
+		gameOver = true;
 	}
 }
