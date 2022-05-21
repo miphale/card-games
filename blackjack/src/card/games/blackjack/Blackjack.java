@@ -144,7 +144,7 @@ public class Blackjack implements Serializable {
 		if(dealer.handValue > 21) {
 			System.out.println();
 			System.out.println("Dealer's hand is over 21. Dealer loses.");
-			playersWin();
+			playersWinOrDoThey();
 		} else {
 			evaluatelayerAgainstDealer(player);
 			
@@ -205,16 +205,30 @@ public class Blackjack implements Serializable {
 	private static void dealerDraws() {
 		if(dealer.handValue > 21) {
 			System.out.println("Dealer's hand is over 21. Dealer loses.");
-			playersWin();
+			playersWinOrDoThey();
 		} else {
-			deck.dealPlayerIn(dealer, true);
+			deck.dealPlayerIn(dealer, true);			
 			revealAllPlayerHands();
 		}
 		
 	}
 	
-	private static void playersWin() {
-		System.out.println(opponents!=null?"Players win.":"Player wins.");
+	private static void playersWinOrDoThey() {
+		if(player.handValue < 21) {
+			System.out.println(player.getName() + " wins.");
+		} else {
+			System.out.println(player.getName() + " loses.");
+		}
+		
+		if(opponentsExist) {
+			for(Player opponent: opponents) {
+				if(opponent.handValue < 21) {
+					System.out.println(opponent.getName() + " wins.");
+				} else {
+					System.out.println(opponent.getName() + " loses.");
+				}
+			}
+		}
 		gameOver = true;
 	}
 }
