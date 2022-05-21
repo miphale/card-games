@@ -39,8 +39,9 @@ public class Blackjack implements Serializable {
 		System.out.println("6: Reset Game");
 		System.out.println("7: Exit");
 		String in = scanner.nextLine();
-		if (in.equals("7")){
-			return;
+		if (in.equals("7")) {
+			System.out.println("Thank you for playing. Goodbye!");
+			System.exit(0);
 		} else {
 			try {
 				menu(in);
@@ -59,6 +60,7 @@ public class Blackjack implements Serializable {
 			System.out.println("Opponents have been setup.");
 		} else if (in.equals("2")) {
 			playBlackjack();
+			gameOver = false;
 		} else if (in.equals("3")) {
 			deck = new Deck();
 			System.out.println("New deck made.");
@@ -139,7 +141,7 @@ public class Blackjack implements Serializable {
 	}
 	
 	private static void evaluatePlayers() {
-		if(dealer.getHandValue() > 21) {
+		if(dealer.handValue > 21) {
 			System.out.println();
 			System.out.println("Dealer's hand is over 21. Dealer loses.");
 			playersWin();
@@ -165,11 +167,11 @@ public class Blackjack implements Serializable {
 	}
 	
 	private static boolean beatsDealer(Player playerToEvaluate) {
-		if (playerToEvaluate.getHand().size() == 5 && playerToEvaluate.getHandValue() < 21) {
+		if (playerToEvaluate.getHand().size() == 5 && playerToEvaluate.handValue < 21) {
 			return true;
 		}
 		
-		if (playerToEvaluate.getHandValue() >= dealer.getHandValue() && playerToEvaluate.getHandValue() < 21) {
+		if (playerToEvaluate.handValue >= dealer.handValue && playerToEvaluate.handValue < 21) {
 			return true;
 		}
 		
@@ -201,20 +203,18 @@ public class Blackjack implements Serializable {
 	}
 	
 	private static void dealerDraws() {
-		if(dealer.getHandValue() > 21) {
+		if(dealer.handValue > 21) {
 			System.out.println("Dealer's hand is over 21. Dealer loses.");
 			playersWin();
-		} else if(dealer.getHandValue() <= 16) {
-			deck.dealPlayerIn(dealer, true);
-			revealAllPlayerHands();
 		} else {
+			deck.dealPlayerIn(dealer, true);
 			revealAllPlayerHands();
 		}
 		
 	}
 	
 	private static void playersWin() {
-		System.out.println("Players win.");
+		System.out.println(opponents!=null?"Players win.":"Player wins.");
 		gameOver = true;
 	}
 }

@@ -10,7 +10,7 @@ public class Player implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String name;
 	private List<Card> hand;
-	private int handValue;
+	public int handValue;
 	
 	public Player(String name) {
 		this.name = name;
@@ -20,9 +20,9 @@ public class Player implements Serializable {
 	
 	public void addCard(Card card, boolean show) {
 		hand.add(card);
+		getHandValue(card);
 		if (show) {
-			System.out.println(name + " has added card: " + card.display());
-			
+			System.out.println(name + " has added card: " + card.display());			
 		}
 	}
 
@@ -30,32 +30,18 @@ public class Player implements Serializable {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public List<Card> getHand() {
 		return hand;
 	}
 
-	public void setHand(List<Card> hand) {
-		this.hand = hand;
-	}
-
-	public int getHandValue() {
-		for (Card card: hand) {
-			//An Ace can be equal to 1 or 11 based on the other cards in hand
-			if(card.getFace().equals(Face.Ace) && handValue <= 10) {
-				handValue += 11;
-			} else {
-				handValue += card.getFace().getValue();
-			}
+	public int getHandValue(Card card) {
+		//An Ace can be equal to 1 or 11 based on the other cards in hand
+		if(card.getFace().equals(Face.Ace) && handValue <= 10) {
+			handValue += 11;
+		} else {
+			handValue += card.getFace().getValue();
 		}
 		return handValue;
-	}
-
-	public void setHandValue(int handValue) {
-		this.handValue = handValue;
 	}
 	
 	public String displayHand(boolean hideCard) {
@@ -71,7 +57,7 @@ public class Player implements Serializable {
                 sb.append('\n');
             }
         }
-        sb.append("Hand value: " + getHandValue());
+        sb.append("Hand value: " + handValue);
         return sb.toString();
     }
 }
