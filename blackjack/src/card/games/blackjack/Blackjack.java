@@ -203,8 +203,8 @@ public class Blackjack implements Serializable {
 	}
 	
 	private static void dealerDraws() {
-		if(dealer.handValue > 21) {
-			System.out.println("Dealer's hand is over 21. Dealer loses.");
+		if(dealer.handValue > 17) {
+			System.out.println("Dealer's hand is over 17. Dealer can't draw anymore.");
 			playersWinOrDoThey();
 		} else {
 			deck.dealPlayerIn(dealer, true);			
